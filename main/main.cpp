@@ -1,12 +1,19 @@
 ﻿#include <iostream>
+#include <string>
+#include <thread>
+#include <chrono>
+#include <format>
+#include <vector>
 
 //definicja zmiennych
 bool sessionActive = false; //sesja
 int currentGame = 0;	//obecna gra
+std::chrono::steady_clock::time_point sessionStart;//czas rozpoczęcia sesji
 
 
 //funkcje
-
+ 
+//wyświetlannie menu głównego
 void displayMenu() {
 	system("cls");
 	std::cout << "GameTools" << std::endl;
@@ -21,6 +28,7 @@ void displayMenu() {
 	std::cout << "Select an option: " << std::endl;
 }
 
+//wybieranie gry w GameTracker
 int chooseGame() {
 	system("cls");
 	std::cout << "Choose Game" << std::endl;
@@ -37,8 +45,45 @@ int chooseGame() {
 	return choiceGame;
 }
 
+//pobieranie nazwy gry w GameTracker
+std::string getGameName(int game)
+{
+	switch (game)
+	{
+	case 1:
+		return "League Of Legends";
+
+	case 2:
+		return "Counter-Strike";
+	case 3:
+		return "Minecraft";
+	case 4:
+		return "EA FC";
+	case 5:
+		return "Other";
+
+	}
+
+	return "...";
+}
+
+//pobieranie czasu sesji
+std::string getSessionDuration() {
+	auto duration = std::chrono::steady_clock::now() - sessionStart;
+	auto secs = std::chrono::duration_cast<std::chrono::seconds>(duration);
+
+	auto h = std::chrono::duration_cast<std::chrono::hours>(secs);
+	secs -= h;
+	auto m = std::chrono::duration_cast<std::chrono::minutes>(secs);
+	secs -= m;
+
+	return std::format("{}h {}min {}s", h.count(), m.count(), secs.count());
+}
+
+//wybieranie trybu w GamneTracker
 void gameTracker()
 {	
+
 	
 	int choiceTracker;
 
@@ -57,43 +102,56 @@ void gameTracker()
 		{
 		case 1:
 			
-			if (sessionActive == true)
+			if (sessionActive)
 			{
 				std::cout << "Session is already active" << std::endl;
+
 			}
 			else
 			{
 				currentGame = chooseGame();
-				std::cout << "Game Selected: " << currentGame << std::endl;
 				sessionActive = true;
+				sessionStart = std::chrono::steady_clock::now();
+				std::cout << "Game Selected: " << getGameName(currentGame) << std::endl;
+				
 			}
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 			break;
 		case 2:
-			// End session
+			if (sessionActive)
+			{
+				auto length = getSessionDuration();
+				std::cout << "session ended " << "Duration: " << length << " seconds" <<std::endl;
+				sessionActive = false;
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
 			break;
 
 		case 3:
-			if (sessionActive = true) {
-				std::cout << "Current session: " << currentGame << std::endl;
+			if (sessionActive) {
+				auto length = getSessionDuration();
+				std::cout << "Current session: " << getGameName(currentGame) << " Duration: " << length << " seconds" << std::endl;
 			}
 			else {
-				std::cout << "Session is not active: "<< std::endl;
+				std::cout << "Session is not active "<< std::endl;
 			}
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 			break;
 
 		case 4:
-			// wyjście z Game Trackera
+			displayMenu();
 			break;
 
 		default:
-			// błędny wybór
+			std::cout << "Invalid choice. Please try again." << std::endl;
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 			break;
 		}
 
 	} while (choiceTracker != 4);
 }
 
-
+//wybieranie trybu w menu głównynm
 int chooseMode() {
 	int choiceModeInside;
 	std::cin >> choiceModeInside;
@@ -102,32 +160,36 @@ int chooseMode() {
 	{
 	case 1:
 		std::cout << "Game Tracker selected" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		gameTracker();
 		break;
 	case 2:
 		std::cout << "FPS Analyzer selected" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		break;
 	case 3:
 		std::cout << "Reaction Test selected" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		break;
 	case 4:
 		std::cout << "Backup Manager selected" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		break;
 	case 5:
 		std::cout << "Statistics selected" << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		break;
 	case 6:
 		std::cout << "Exiting..." << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		break;	
+	default:
+		std::cout << "Invalid choice. Please try again." << std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		break;
 	}
 	return choiceModeInside;
 }
-
-
-
-
-
-
 
 int main()
 {
